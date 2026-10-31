@@ -222,3 +222,7 @@ _One of the browser demos in the [Crypto Lab](https://crypto-lab.systemslibraria
 
 _“So whether you eat or drink or whatever you do, do it all for the glory of
 God.” — 1 Corinthians 10:31_
+
+## Research review extension 31 October 2026
+
+R20261031-13: A separately labeled broken polynomial-CRT construction enumerates all 16 coalitions over all 625 dealer choices in F5. All public helpers are part of the view. Single-member reconstruction is checked by a separate algebraic derivation for every dealer choice. This is not a repair or break of the existing PSMT or Shamir demonstrations.
