@@ -156,6 +156,38 @@ function digestTree(directory) {
   return hash.digest("hex");
 }
 
+/*
+ * Refuse a dirty tree before touching a single source byte.
+ *
+ * This gate writes mutated bytes over real files and restores them from a Map
+ * held in memory. If the tree already carries uncommitted work, a crash or a
+ * timeout between those two writes loses it, and every restore check below
+ * compares against bytes that were never committed. Five labs in this fleet
+ * already refuse here; hostile-paths did not, so `npm run test:mutations`
+ * could run against a half-finished edit and call the result a baseline.
+ *
+ * Untracked files count, exactly as they do for the other five: this script
+ * reads whole directories to digest the build, so a file nobody has added is
+ * read like a tracked one. Ignored paths (test-results, dist, node_modules)
+ * never appear in porcelain output, so the gate's own artifacts cannot trip it.
+ */
+function assertCleanTree() {
+  const status = spawnSync(
+    "git",
+    ["status", "--porcelain=v1", "--untracked-files=all"],
+    { cwd: root, encoding: "utf8" },
+  );
+  if (status.error) throw status.error;
+  if (status.status !== 0)
+    throw new Error(
+      `could not read the working tree: git exited ${status.status}`,
+    );
+  if (status.stdout.trim() !== "")
+    throw new Error(`working tree is not clean: ${status.stdout.trim()}`);
+}
+
+assertCleanTree();
+
 fs.rmSync(evidenceDir, { recursive: true, force: true });
 fs.mkdirSync(evidenceDir, { recursive: true });
 
