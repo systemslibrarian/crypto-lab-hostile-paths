@@ -167,6 +167,21 @@ test("more than t observations reveal the exact secret and withdraw privacy", as
   ).toBeVisible();
 });
 
+test("empty message is refused and an explicit zero is a valid byte", async ({
+  page,
+}) => {
+  await page.locator("#message").fill("");
+  await page.locator("#run").click();
+  await expect(page.locator('[data-verdict="input-rejected"]')).toBeVisible();
+  await expect(page.locator("#psmt-result")).toHaveCount(0);
+  await page.locator("#message").fill("0");
+  await page.locator("#run").click();
+  await expect(page.locator("#psmt-result")).toHaveText("recovered 0");
+  await expect(page.locator('[data-verdict="privacy"]')).toContainText(
+    "256 selectable message bytes",
+  );
+});
+
 test("invalid action totals release no stale protocol result", async ({
   page,
 }) => {

@@ -65,7 +65,8 @@ paper's optimal multi-symbol rate.
 
 ### Privacy
 
-Any `v <= t` evaluations leave every one of the 257 possible messages with the
+Any `v <= t` evaluations leave each of the 256 selectable message bytes compatible. The census
+also checks the extra field constant 256, which the message control excludes. All 257 constants have the
 same number `257^(t-v)` of compatible coefficient vectors. The learner-visible
 census establishes this directly: for every candidate secret it solves the
 corresponding affine linear system over GF(257), checks consistency and rank,

@@ -21,8 +21,11 @@ function numberInput(
 }
 
 function readInteger(id: string): number {
-  const input = element<HTMLInputElement>(`#${id}`);
-  const value = Number(input.value);
+  const input = element<HTMLInputElement | HTMLSelectElement>(`#${id}`);
+  const value =
+    input instanceof HTMLInputElement
+      ? input.valueAsNumber
+      : Number(input.value);
   if (!Number.isInteger(value))
     throw new Error(
       `${input.labels?.[0]?.textContent ?? id} must be an integer`,
@@ -169,7 +172,7 @@ function renderEvidence(run: ProtocolRun): string {
         <h3>Attacker-view completion census</h3>
         <div class="metrics compact">
           <div class="metric"><strong>${run.privacy.viewCount}</strong><span>path values seen</span></div>
-          <div class="metric"><strong id="privacy-candidates">${run.privacy.candidateSecrets.length}</strong><span>possible field secrets</span></div>
+          <div class="metric"><strong id="privacy-candidates">${run.privacy.candidateSecrets.length}</strong><span>possible field constants</span></div>
           <div class="metric"><strong id="privacy-completions">${completions.toString()}</strong><span>polynomials per candidate</span></div>
         </div>
         ${verdict(
@@ -178,7 +181,7 @@ function renderEvidence(run: ProtocolRun): string {
             ? "Perfect privacy holds for this view"
             : "The view leaks message information",
           run.privacy.perfectlyPrivateForRun
-            ? `All ${PRIME} field elements remain possible with exactly ${completions.toString()} coefficient completion(s) each. This is an exact linear-system census, not a hidden-label assertion.`
+            ? `All ${PRIME} field elements remain possible with exactly ${completions.toString()} coefficient completion(s) each. All 256 selectable message bytes are therefore compatible. The extra field element 256 can be a mask or share.`
             : `Only ${run.privacy.candidateSecrets.length} of ${PRIME} field elements remain possible. More than t shares are outside the selected privacy promise.`,
           "privacy",
         )}
